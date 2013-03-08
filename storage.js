@@ -108,7 +108,7 @@ function IDBStorage() {
 
   function removeItem(key, callback) {
     withStore('readwrite', function removeItemBody(store) {
-      var req = store.delete(key);
+      var req = store['delete'](key);
       if (callback) {
         req.onsuccess = function removeItemOnSuccess() {
           setTimeout(callback, 0);
