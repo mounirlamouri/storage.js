@@ -49,24 +49,21 @@
         succeededTests++;
         log('success', msg);
       }
-      function failure(msg) {
+      function failure(msg, value, test) {
         failedTests++;
-        log('failure', msg);
+        log('failure', msg + " | got " + value + ", expected " + test);
       }
 
-      function ok(test, msg) {
-        if (test) {
+      function is(value, test, msg) {
+        if (value === test) {
           success(msg);
         } else {
-          failure(msg);
+          failure(msg, value, test);
         }
-      }
-      function is(value, test, msg) {
-        ok(value === test, msg);
       }
     </script>
     <script>
-      ok(window.asyncStorage,
+      is(typeof window.asyncStorage, 'object',
          'We should have a window.asyncStorage object');
 
       var storage = window.asyncStorage;
