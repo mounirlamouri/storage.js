@@ -44,8 +44,7 @@
  * Unit tests are in apps/gallery/test/unit/asyncStorage_test.js
  */
 
-this.asyncStorage = (function() {
-
+function IDBStorage() {
   var DBNAME = 'asyncStorage';
   var DBVERSION = 1;
   var STORENAME = 'keyvaluepairs';
@@ -183,5 +182,69 @@ this.asyncStorage = (function() {
     length: length,
     key: key
   };
+}
+
+function LocalStorage() {
+  function getItem(key, callback) {
+    var value = localStorage.getItem(key);
+    try {
+      value = JSON.parse(value);
+      if (value['-moz-stringifier']) {
+        value = value['-moz-stringifier'];
+      }
+    } catch(e) {
+    } finally {
+      setTimeout(function() { callback(value); }, 0);
+    }
+  }
+
+  function setItem(key, value, callback) {
+    if (typeof value === 'object') {
+      value = { '-moz-stringifier': value };
+      value = JSON.stringify(value);
+    }
+    localStorage.setItem(key, value);
+    setTimeout(callback, 0);
+  }
+
+  function removeItem(key, callback) {
+    localStorage.removeItem(key);
+    setTimeout(callback, 0);
+  }
+
+  function clear(callback) {
+    localStorage.clear();
+    setTimeout(callback, 0);
+  }
+
+  function length(callback) {
+    var length = localStorage.length;
+    setTimeout(function() { callback(length); }, 0);
+  }
+
+  function key(index, callback) {
+    var name = localStorage.key(index);
+    if (name === undefined) {
+      name = null;
+    }
+    setTimeout(function() { callback(name); }, 0);
+  }
+
+  return {
+    getItem: getItem,
+    setItem: setItem,
+    removeItem: removeItem,
+    clear: clear,
+    length: length,
+    key: key
+  };
+}
+
+this.asyncStorage = (function() {
+  if ('indexedDB' in window) {
+    return IDBStorage();
+  }
+  // We don't expect any other kind of fallback for the moment.
+  return LocalStorage();
 }());
 
