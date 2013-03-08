@@ -77,7 +77,7 @@ this.asyncStorage = (function() {
         var value = req.result;
         if (value === undefined)
           value = null;
-        callback(value);
+        setTimeout(function() { callback(value); }, 0);
       };
       req.onerror = function getItemOnError() {
         console.error('Error in asyncStorage.getItem(): ', req.error.name);
@@ -90,7 +90,7 @@ this.asyncStorage = (function() {
       var req = store.put(value, key);
       if (callback) {
         req.onsuccess = function setItemOnSuccess() {
-          callback();
+          setTimeout(callback, 0);
         };
       }
       req.onerror = function setItemOnError() {
@@ -104,7 +104,7 @@ this.asyncStorage = (function() {
       var req = store.delete(key);
       if (callback) {
         req.onsuccess = function removeItemOnSuccess() {
-          callback();
+          setTimeout(callback, 0);
         };
       }
       req.onerror = function removeItemOnError() {
@@ -118,7 +118,7 @@ this.asyncStorage = (function() {
       var req = store.clear();
       if (callback) {
         req.onsuccess = function clearOnSuccess() {
-          callback();
+          setTimeout(callback, 0);
         };
       }
       req.onerror = function clearOnError() {
@@ -131,7 +131,7 @@ this.asyncStorage = (function() {
     withStore('readonly', function lengthBody(store) {
       var req = store.count();
       req.onsuccess = function lengthOnSuccess() {
-        callback(req.result);
+        setTimeout(function() { callback(req.result); }, 0);
       };
       req.onerror = function lengthOnError() {
         console.error('Error in asyncStorage.length(): ', req.error.name);
@@ -141,7 +141,7 @@ this.asyncStorage = (function() {
 
   function key(n, callback) {
     if (n < 0) {
-      callback(null);
+      setTimeout(function() { callback(null); }, 0);
       return;
     }
 
@@ -152,12 +152,12 @@ this.asyncStorage = (function() {
         var cursor = req.result;
         if (!cursor) {
           // this means there weren't enough keys
-          callback(null);
+          setTimeout(function() { callback(null); }, 0);
           return;
         }
         if (n === 0) {
           // We have the first key, return it if that's what they wanted
-          callback(cursor.key);
+          setTimeout(function() { callback(cursor.key); }, 0);
         } else {
           if (!advanced) {
             // Otherwise, ask the cursor to skip ahead n records
@@ -165,7 +165,7 @@ this.asyncStorage = (function() {
             cursor.advance(n);
           } else {
             // When we get here, we've got the nth key.
-            callback(cursor.key);
+            setTimeout(function() { callback(cursor.key); }, 0);
           }
         }
       };
