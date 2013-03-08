@@ -73,8 +73,6 @@
         function() {
           is(typeof storage.length, 'function',
             'storage should have .length()');
-          is(typeof storage.key, 'function',
-             'storage should have .key()');
           is(typeof storage.getItem, 'function',
              'storage should have .getItem()');
           is(typeof storage.setItem, 'function',
@@ -163,24 +161,12 @@
                       storage.setItem('key3', 'value3', function() {
                         storage.length(function(len) {
                           is(len, 3, 'length should be 3');
-                          storage.key(0, function(key) {
-                            is(key, 'key1', '0 is associated with \'key1\'');
-                            storage.key(1, function(key) {
-                              is(key, 'key2', '1 is associated with \'key2\'');
-                              storage.key(2, function(key) {
-                                is(key, 'key3', '2 is associated with \'key3\'');
-                                storage.key(3, function(key) {
-                                  is(key, null, '3 is not associated with a key');
-                                  storage.clear(function() {
-                                    storage.key(0, function(key) {
-                                      is(key, null, 'there is no key associted with 0');
-                                      storage.length(function(len) {
-                                        is(len, 0, 'length should be back to 0');
-                                        next();
-                                      });
-                                    });
-                                  });
-                                });
+                          storage.clear(function() {
+                            storage.getItem('key1', function(value) {
+                              is(value, null, 'there is no key1 item anymore');
+                              storage.length(function(len) {
+                                is(len, 0, 'length should be back to 0');
+                                next();
                               });
                             });
                           });

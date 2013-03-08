@@ -138,49 +138,12 @@ function IDBStorage() {
     });
   }
 
-  function key(n, callback) {
-    if (n < 0) {
-      setTimeout(function() { callback(null); }, 0);
-      return;
-    }
-
-    withStore('readonly', function keyBody(store) {
-      var advanced = false;
-      var req = store.openCursor();
-      req.onsuccess = function keyOnSuccess() {
-        var cursor = req.result;
-        if (!cursor) {
-          // this means there weren't enough keys
-          setTimeout(function() { callback(null); }, 0);
-          return;
-        }
-        if (n === 0) {
-          // We have the first key, return it if that's what they wanted
-          setTimeout(function() { callback(cursor.key); }, 0);
-        } else {
-          if (!advanced) {
-            // Otherwise, ask the cursor to skip ahead n records
-            advanced = true;
-            cursor.advance(n);
-          } else {
-            // When we get here, we've got the nth key.
-            setTimeout(function() { callback(cursor.key); }, 0);
-          }
-        }
-      };
-      req.onerror = function keyOnError() {
-        console.error('Error in asyncStorage.key(): ', req.error.name);
-      };
-    });
-  }
-
   return {
     getItem: getItem,
     setItem: setItem,
     removeItem: removeItem,
     clear: clear,
     length: length,
-    key: key
   };
 }
 
@@ -226,21 +189,12 @@ function LocalStorage() {
     setTimeout(function() { callback(length); }, 0);
   }
 
-  function key(index, callback) {
-    var name = localStorage.key(index);
-    if (name === undefined) {
-      name = null;
-    }
-    setTimeout(function() { callback(name); }, 0);
-  }
-
   return {
     getItem: getItem,
     setItem: setItem,
     removeItem: removeItem,
     clear: clear,
     length: length,
-    key: key
   };
 }
 
