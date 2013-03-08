@@ -107,6 +107,24 @@
             });
           });
         },
+        // Get/set null and undefined.
+        function() {
+          storage.setItem('foo', null, function() {
+            storage.getItem('foo', function(value) {
+              is(value, null, 'value should be null');
+
+              storage.setItem('foo', undefined, function() {
+                storage.getItem('foo', function(value) {
+                  is(value, null, 'value should be null');
+
+                  storage.removeItem('foo', function() {
+                    next();
+                  });
+                });
+              });
+            });
+          });
+        },
         // Check complex get/set/remove.
         function() {
           var object = {

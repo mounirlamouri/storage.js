@@ -199,6 +199,10 @@ function LocalStorage() {
   }
 
   function setItem(key, value, callback) {
+    if (value === null || value === undefined) {
+      return removeItem(key, callback);
+    }
+
     if (typeof value === 'object') {
       value = { '-moz-stringifier': value };
       value = JSON.stringify(value);
