@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Tests for storage.js</title>
+    <script src='storage.js'></script>
+    <style>
+      .success {
+        color: green;
+      }
+      .failure {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+  </body>
+    <script>
+      var tests = [];
+      var testIdx = -1;
+
+      var succeededTests = 0;
+      var failedTests = 0;
+
+      function done() {
+        var div = document.createElement('div');
+        div.className = 'results';
+        div.innerHTML = '<div><span>Success:</span> ' + succeededTests + '</div>' +
+                        '<div><span>Failures:</span> ' + failedTests + '</div>';
+        document.body.appendChild(div);
+      }
+
+      function next() {
+        testIdx++;
+        if (testIdx < tests.length) {
+          tests[testIdx]();
+        } else {
+          done();
+        }
+      }
+
+      function log(type, msg) {
+        var div = document.createElement('div');
+        div.className = type;
+        div.textContent = type.toUpperCase() + " - " + msg;
+        document.body.appendChild(div);
+      }
+
+      function success(msg) {
+        succeededTests++;
+        log('success', msg);
+      }
+      function failure(msg) {
+        failedTests++;
+        log('failure', msg);
+      }
+
+      function ok(test, msg) {
+        if (test) {
+          success(msg);
+        } else {
+          failure(msg);
+        }
+      }
+      function is(value, test, msg) {
+        ok(value === test, msg);
+      }
+    </script>
+    <script>
+      ok(window.asyncStorage,
+         'We should have a window.asyncStorage object');
+
+      var storage = window.asyncStorage;
+
+      tests = [
+        // Check the interface.
+        function() {
+          is(typeof storage.length, 'function',
+            'storage should have .length()');
+          is(typeof storage.key, 'function',
+             'storage should have .key()');
+          is(typeof storage.getItem, 'function',
+             'storage should have .getItem()');
+          is(typeof storage.setItem, 'function',
+             'storage should have .setItem()');
+          is(typeof storage.removeItem, 'function',
+             'storage should have .removeItem()');
+          is(typeof storage.clear, 'function',
+             'storage should have .method()');
+
+          next();
+        },
+        // Check basic get/set/remove.
+        function() {
+          storage.setItem('foo', 'bar', function() {
+            storage.getItem('foo', function(value) {
+              is(value, 'bar', 'value should be \'bar\'');
+
+              storage.setItem('foo', 'overwritten', function() {
+                storage.getItem('foo', function(value) {
+                  is(value, 'overwritten', 'value should be \'overwritten\'');
+
+                  storage.removeItem('foo', function() {
+                    storage.getItem('foo', function(value) {
+                      is(value, null, 'value should be null');
+                      next();
+                    });
+                  });
+                });
+              });
+            });
+          });
+        },
+        // Check complex get/set/remove.
+        function() {
+          var object = {
+            x: 1,
+            y: 'foo',
+            z: true
+          };
+
+          storage.setItem('foo', object, function() {
+            storage.getItem('foo', function(result) {
+              is(typeof result, 'object', 'result should be an object');
+              is(result.x, 1, 'result.x should be 1');
+              is(result.y, 'foo', 'result.y should be \'foo\'');
+              is(result.z, true, 'result.z should be true');
+
+              storage.removeItem('foo', function() {
+                storage.getItem('foo', function(value) {
+                  is(value, null, 'value should be null');
+                  next();
+                });
+              });
+            });
+          });
+        },
+        // Check clear/length/key.
+        function() {
+          storage.clear(function() {
+            storage.length(function(len) {
+              is(len, 0, 'length should be 0 after clearing');
+              storage.setItem('key1', 'value1', function() {
+                storage.length(function(len) {
+                  is(len, 1, 'length should be 1');
+                  storage.setItem('key2', 'value2', function() {
+                    storage.length(function(len) {
+                      is(len, 2, 'length should be 2');
+                      storage.setItem('key3', 'value3', function() {
+                        storage.length(function(len) {
+                          is(len, 3, 'length should be 3');
+                          storage.key(0, function(key) {
+                            is(key, 'key1', '0 is associated with \'key1\'');
+                            storage.key(1, function(key) {
+                              is(key, 'key2', '1 is associated with \'key2\'');
+                              storage.key(2, function(key) {
+                                is(key, 'key3', '2 is associated with \'key3\'');
+                                storage.key(3, function(key) {
+                                  is(key, null, '3 is not associated with a key');
+                                  storage.clear(function() {
+                                    storage.key(0, function(key) {
+                                      is(key, null, 'there is no key associted with 0');
+                                      storage.length(function(len) {
+                                        is(len, 0, 'length should be back to 0');
+                                        next();
+                                      });
+                                    });
+                                  });
+                                });
+                              });
+                            });
+                          });
+                        });
+                      });
+                    });
+                  });
+                });
+              });
+            });
+          });
+        },
+      ];
+
+      next();
+    </script>
+</html>
