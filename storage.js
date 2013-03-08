@@ -44,6 +44,14 @@
  * Unit tests are in apps/gallery/test/unit/asyncStorage_test.js
  */
 
+var DEBUG = false;
+
+function _error(msg) {
+  if (DEBUG == true) {
+    console.error(msg);
+  }
+}
+
 function IDBStorage() {
   var DBNAME = 'asyncStorage';
   var DBVERSION = 1;
@@ -56,7 +64,7 @@ function IDBStorage() {
     } else {
       var openreq = indexedDB.open(DBNAME, DBVERSION);
       openreq.onerror = function withStoreOnError() {
-        console.error("asyncStorage: can't open database:", openreq.error.name);
+        _error("asyncStorage: can't open database:" + openreq.error.name);
       };
       openreq.onupgradeneeded = function withStoreOnUpgradeNeeded() {
         // First time setup: create an empty object store
@@ -79,7 +87,7 @@ function IDBStorage() {
         setTimeout(function() { callback(value); }, 0);
       };
       req.onerror = function getItemOnError() {
-        console.error('Error in asyncStorage.getItem(): ', req.error.name);
+        _error('Error in asyncStorage.getItem(): ' + req.error.name);
       };
     });
   }
@@ -93,7 +101,7 @@ function IDBStorage() {
         };
       }
       req.onerror = function setItemOnError() {
-        console.error('Error in asyncStorage.setItem(): ', req.error.name);
+        _error('Error in asyncStorage.setItem(): ' + req.error.name);
       };
     });
   }
@@ -107,7 +115,7 @@ function IDBStorage() {
         };
       }
       req.onerror = function removeItemOnError() {
-        console.error('Error in asyncStorage.removeItem(): ', req.error.name);
+        _error('Error in asyncStorage.removeItem(): ' + req.error.name);
       };
     });
   }
@@ -121,7 +129,7 @@ function IDBStorage() {
         };
       }
       req.onerror = function clearOnError() {
-        console.error('Error in asyncStorage.clear(): ', req.error.name);
+        _error('Error in asyncStorage.clear(): ' + req.error.name);
       };
     });
   }
@@ -133,7 +141,7 @@ function IDBStorage() {
         setTimeout(function() { callback(req.result); }, 0);
       };
       req.onerror = function lengthOnError() {
-        console.error('Error in asyncStorage.length(): ', req.error.name);
+        _error('Error in asyncStorage.length(): ' + req.error.name);
       };
     });
   }
