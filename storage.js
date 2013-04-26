@@ -93,6 +93,10 @@ function IDBStorage() {
   }
 
   function setItem(key, value, callback) {
+    // IE10 has a bug and miserably fails when store.put(null, key) is called.
+    if (value == null) {
+      return removeItem(key, callback);
+    }
     withStore('readwrite', function setItemBody(store) {
       var req = store.put(value, key);
       if (callback) {
