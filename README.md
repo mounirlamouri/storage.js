@@ -4,8 +4,7 @@ storage.js
 JS library that will provide an asynchronous storage API.
 It will use IndexedDB if present, localStorage otherwise.
 
-API
-===
+## API
 
 The API aims to be very simple and close to localStorage.
 
@@ -18,8 +17,7 @@ clear()
 length()
 ```
 
-Tests
-=====
+## Tests
 
 Tests are available in *test.html*.
 
