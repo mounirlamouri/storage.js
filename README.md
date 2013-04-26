@@ -27,3 +27,7 @@ They currently pass in:
  * Chrome 14+ (4-13 not tested)
  * Opera 10.0+
  * Safari 4.0+
+
+## Authors
+
+David Flanagan & Mounir Lamouri
