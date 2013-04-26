@@ -61,6 +61,13 @@ They currently pass in:
  * Chrome 7+ (4-6 not tested)
  * Opera 10.0+
  * Safari 4.0+
+ * Safari iOS 3.2+
+ * Android Browser 2.2+
+
+Not tested but should be working on:
+ * Firefox Android
+ * Chrome Android
+ * Blackberry Mobile
 
 ## Authors
 
