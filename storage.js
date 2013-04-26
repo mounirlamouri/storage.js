@@ -1,46 +1,5 @@
 'use strict';
 
-/**
- * This file defines an asynchronous version of the localStorage API, backed by
- * an IndexedDB database.  It creates a global storage object that has methods
- * like the localStorage object.
- *
- * To store a value use set:
- *
- *   storage.set('key', 'value');
- *
- * If you want confirmation that the value has been stored, pass a callback
- * function as the third argument:
- *
- *  storage.set('key', 'newvalue', function() {
- *    console.log('new value stored');
- *  });
- *
- * To read a value, call get(), but note that you must supply a callback
- * function that the value will be passed to asynchronously:
- *
- *  storage.get('key', function(value) {
- *    console.log('The value of key is:', value);
- *  });
- *
- * Note that unlike localStorage, storage does not allow you to store and
- * retrieve values by setting and querying properties directly. You cannot just
- * write storage.key; you have to explicitly call set() or get().
- *
- * remove(), clear(), length(), and key() are like the same-named methods of
- * localStorage, but, like get() and set() they take a callback
- * argument.
- *
- * The asynchronous nature of get() makes it tricky to retrieve multiple
- * values. But unlike localStorage, storage does not require the values you
- * store to be strings.  So if you need to save multiple values and want to
- * retrieve them together, in a single asynchronous operation, just group the
- * values into a single object. The properties of this object may not include
- * DOM elements, but they may include things like Blobs and typed arrays.
- *
- * Unit tests are in test.html
- */
-
 var DEBUG = false;
 
 function _error(msg) {
