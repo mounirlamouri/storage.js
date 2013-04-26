@@ -63,6 +63,7 @@ They currently pass in:
  * Safari 4.0+
  * Safari iOS 3.2+
  * Android Browser 2.2+
+ * Opera Mobile 11.0+
 
 Not tested but should be working on:
  * Firefox Android
