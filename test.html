@@ -24,8 +24,8 @@
       function done() {
         var div = document.createElement('div');
         div.className = 'results';
-        div.innerHTML = '<div><span>Success:</span> ' + succeededTests + '</div>' +
-                        '<div><span>Failures:</span> ' + failedTests + '</div>';
+        div.innerHTML = '<div>Success: ' + succeededTests + '</div>' +
+                        '<div>Failures: ' + failedTests + '</div>';
         document.body.appendChild(div);
       }
 
@@ -62,11 +62,12 @@
         }
       }
     </script>
-    <script>
-      is(typeof window.asyncStorage, 'object',
-         'We should have a window.asyncStorage object');
 
-      var storage = window.asyncStorage;
+    <script>
+      is(typeof window.storage, 'object',
+         'We should have a window.storage object');
+
+      var storage = window.storage;
 
       tests = [
         // Check the interface.
@@ -181,6 +182,7 @@
         }
       ];
 
+      // Start the test suite.
       next();
     </script>
   </body>
