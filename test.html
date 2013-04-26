@@ -74,12 +74,12 @@
         function() {
           is(typeof storage.length, 'function',
             'storage should have .length()');
-          is(typeof storage.getItem, 'function',
-             'storage should have .getItem()');
-          is(typeof storage.setItem, 'function',
-             'storage should have .setItem()');
-          is(typeof storage.removeItem, 'function',
-             'storage should have .removeItem()');
+          is(typeof storage.get, 'function',
+             'storage should have .get()');
+          is(typeof storage.set, 'function',
+             'storage should have .set()');
+          is(typeof storage.remove, 'function',
+             'storage should have .remove()');
           is(typeof storage.clear, 'function',
              'storage should have .clear()');
 
@@ -87,16 +87,16 @@
         },
         // Check basic get/set/remove.
         function() {
-          storage.setItem('foo', 'bar', function() {
-            storage.getItem('foo', function(value) {
+          storage.set('foo', 'bar', function() {
+            storage.get('foo', function(value) {
               is(value, 'bar', 'value should be \'bar\'');
 
-              storage.setItem('foo', 'overwritten', function() {
-                storage.getItem('foo', function(value) {
+              storage.set('foo', 'overwritten', function() {
+                storage.get('foo', function(value) {
                   is(value, 'overwritten', 'value should be \'overwritten\'');
 
-                  storage.removeItem('foo', function() {
-                    storage.getItem('foo', function(value) {
+                  storage.remove('foo', function() {
+                    storage.get('foo', function(value) {
                       is(value, null, 'value should be null');
                       next();
                     });
@@ -108,15 +108,15 @@
         },
         // Get/set null and undefined.
         function() {
-          storage.setItem('foo', null, function() {
-            storage.getItem('foo', function(value) {
+          storage.set('foo', null, function() {
+            storage.get('foo', function(value) {
               is(value, null, 'value should be null');
 
-              storage.setItem('foo', undefined, function() {
-                storage.getItem('foo', function(value) {
+              storage.set('foo', undefined, function() {
+                storage.get('foo', function(value) {
                   is(value, null, 'value should be null');
 
-                  storage.removeItem('foo', function() {
+                  storage.remove('foo', function() {
                     next();
                   });
                 });
@@ -132,15 +132,15 @@
             z: true
           };
 
-          storage.setItem('foo', object, function() {
-            storage.getItem('foo', function(result) {
+          storage.set('foo', object, function() {
+            storage.get('foo', function(result) {
               is(typeof result, 'object', 'result should be an object');
               is(result.x, 1, 'result.x should be 1');
               is(result.y, 'foo', 'result.y should be \'foo\'');
               is(result.z, true, 'result.z should be true');
 
-              storage.removeItem('foo', function() {
-                storage.getItem('foo', function(value) {
+              storage.remove('foo', function() {
+                storage.get('foo', function(value) {
                   is(value, null, 'value should be null');
                   next();
                 });
@@ -153,17 +153,17 @@
           storage.clear(function() {
             storage.length(function(len) {
               is(len, 0, 'length should be 0 after clearing');
-              storage.setItem('key1', 'value1', function() {
+              storage.set('key1', 'value1', function() {
                 storage.length(function(len) {
                   is(len, 1, 'length should be 1');
-                  storage.setItem('key2', 'value2', function() {
+                  storage.set('key2', 'value2', function() {
                     storage.length(function(len) {
                       is(len, 2, 'length should be 2');
-                      storage.setItem('key3', 'value3', function() {
+                      storage.set('key3', 'value3', function() {
                         storage.length(function(len) {
                           is(len, 3, 'length should be 3');
                           storage.clear(function() {
-                            storage.getItem('key1', function(value) {
+                            storage.get('key1', function(value) {
                               is(value, null, 'there is no key1 item anymore');
                               storage.length(function(len) {
                                 is(len, 0, 'length should be back to 0');

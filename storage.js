@@ -8,33 +8,33 @@
  * an IndexedDB database.  It creates a global storage object that has methods
  * like the localStorage object.
  *
- * To store a value use setItem:
+ * To store a value use set:
  *
- *   storage.setItem('key', 'value');
+ *   storage.set('key', 'value');
  *
  * If you want confirmation that the value has been stored, pass a callback
  * function as the third argument:
  *
- *  storage.setItem('key', 'newvalue', function() {
+ *  storage.set('key', 'newvalue', function() {
  *    console.log('new value stored');
  *  });
  *
- * To read a value, call getItem(), but note that you must supply a callback
+ * To read a value, call get(), but note that you must supply a callback
  * function that the value will be passed to asynchronously:
  *
- *  storage.getItem('key', function(value) {
+ *  storage.get('key', function(value) {
  *    console.log('The value of key is:', value);
  *  });
  *
  * Note that unlike localStorage, storage does not allow you to store and
  * retrieve values by setting and querying properties directly. You cannot just
- * write storage.key; you have to explicitly call setItem() or getItem().
+ * write storage.key; you have to explicitly call set() or get().
  *
- * removeItem(), clear(), length(), and key() are like the same-named methods of
- * localStorage, but, like getItem() and setItem() they take a callback
+ * remove(), clear(), length(), and key() are like the same-named methods of
+ * localStorage, but, like get() and set() they take a callback
  * argument.
  *
- * The asynchronous nature of getItem() makes it tricky to retrieve multiple
+ * The asynchronous nature of get() makes it tricky to retrieve multiple
  * values. But unlike localStorage, storage does not require the values you
  * store to be strings.  So if you need to save multiple values and want to
  * retrieve them together, in a single asynchronous operation, just group the
@@ -77,49 +77,49 @@ function IDBStorage() {
     }
   }
 
-  function getItem(key, callback) {
-    withStore('readonly', function getItemBody(store) {
+  function get(key, callback) {
+    withStore('readonly', function getBody(store) {
       var req = store.get(key);
-      req.onsuccess = function getItemOnSuccess() {
+      req.onsuccess = function getOnSuccess() {
         var value = req.result;
         if (value === undefined)
           value = null;
         setTimeout(function() { callback(value); }, 0);
       };
-      req.onerror = function getItemOnError() {
-        _error('Error in storage.getItem(): ' + req.error.name);
+      req.onerror = function getOnError() {
+        _error('Error in storage.get(): ' + req.error.name);
       };
     });
   }
 
-  function setItem(key, value, callback) {
+  function set(key, value, callback) {
     // IE10 has a bug and miserably fails when store.put(null, key) is called.
     if (value == null) {
-      return removeItem(key, callback);
+      return remove(key, callback);
     }
-    withStore('readwrite', function setItemBody(store) {
+    withStore('readwrite', function setmBody(store) {
       var req = store.put(value, key);
       if (callback) {
-        req.onsuccess = function setItemOnSuccess() {
+        req.onsuccess = function setOnSuccess() {
           setTimeout(callback, 0);
         };
       }
-      req.onerror = function setItemOnError() {
-        _error('Error in storage.setItem(): ' + req.error.name);
+      req.onerror = function setOnError() {
+        _error('Error in storage.set(): ' + req.error.name);
       };
     });
   }
 
-  function removeItem(key, callback) {
-    withStore('readwrite', function removeItemBody(store) {
+  function remove(key, callback) {
+    withStore('readwrite', function removeBody(store) {
       var req = store['delete'](key);
       if (callback) {
-        req.onsuccess = function removeItemOnSuccess() {
+        req.onsuccess = function removeOnSuccess() {
           setTimeout(callback, 0);
         };
       }
-      req.onerror = function removeItemOnError() {
-        _error('Error in storage.removeItem(): ' + req.error.name);
+      req.onerror = function removeOnError() {
+        _error('Error in storage.remove(): ' + req.error.name);
       };
     });
   }
@@ -151,17 +151,17 @@ function IDBStorage() {
   }
 
   return {
-    getItem: getItem,
-    setItem: setItem,
-    removeItem: removeItem,
+    get: get,
+    set: set,
+    remove: remove,
     clear: clear,
     length: length,
   };
 }
 
 function LocalStorage() {
-  function getItem(key, callback) {
-    var value = localStorage.getItem(key);
+  function get(key, callback) {
+    var value = localStorage.get(key);
     try {
       value = JSON.parse(value);
       if (value['-moz-stringifier']) {
@@ -173,21 +173,21 @@ function LocalStorage() {
     }
   }
 
-  function setItem(key, value, callback) {
+  function set(key, value, callback) {
     if (value === null || value === undefined) {
-      return removeItem(key, callback);
+      return remove(key, callback);
     }
 
     if (typeof value === 'object') {
       value = { '-moz-stringifier': value };
       value = JSON.stringify(value);
     }
-    localStorage.setItem(key, value);
+    localStorage.set(key, value);
     setTimeout(callback, 0);
   }
 
-  function removeItem(key, callback) {
-    localStorage.removeItem(key);
+  function remove(key, callback) {
+    localStorage.remove(key);
     setTimeout(callback, 0);
   }
 
@@ -202,9 +202,9 @@ function LocalStorage() {
   }
 
   return {
-    getItem: getItem,
-    setItem: setItem,
-    removeItem: removeItem,
+    get: get,
+    set: set,
+    remove: remove,
     clear: clear,
     length: length,
   };
