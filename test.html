@@ -124,7 +124,10 @@
             });
           });
         },
+
         // Check complex get/set/remove.
+        // This is currently disabled because not supported.
+        /*
         function() {
           var object = {
             x: 1,
@@ -147,7 +150,8 @@
               });
             });
           });
-        },
+        },*/
+
         // Check clear/length/key.
         function() {
           storage.clear(function() {
@@ -179,6 +183,40 @@
               });
             });
           });
+        },
+
+        // storage.set() doesn't take objects.
+        function() {
+          try {
+            storage.set('foo', document.createElement('div'), function() {
+              is(true, false, 'should have failed');
+              next();
+            });
+          } catch(e) {
+            is(true, true, "can't set an HTMLElement");
+          }
+
+          try {
+            storage.set('foo', new Blob(), function() {
+              is(true, false, 'should have failed');
+              next();
+            });
+          } catch(e) {
+            is(true, true, "can't set a Blob");
+          }
+
+          try {
+            storage.set('foo', { x: 'bar' },
+              function() {
+                is(true, false, 'should have failed');
+                next();
+              }
+            );
+          } catch (e) {
+            is(true, true, "can't set an object");
+          }
+
+          next();
         }
       ];
 

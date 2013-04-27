@@ -53,6 +53,11 @@ function IDBStorage() {
     if (value === null || value === undefined) {
       return remove(key, callback);
     }
+
+    if (typeof value === 'object') {
+      throw "InvalidArgument";
+    }
+
     withStore('readwrite', function setmBody(store) {
       var req = store.put(value, key);
       if (callback) {
@@ -135,9 +140,9 @@ function LocalStorage() {
     }
 
     if (typeof value === 'object') {
-      value = { '-moz-stringifier': value };
-      value = JSON.stringify(value);
+      throw "InvalidArgument";
     }
+
     localStorage.setItem(key, value);
     setTimeout(callback, 0);
   }
