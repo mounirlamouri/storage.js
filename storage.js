@@ -50,7 +50,7 @@ function IDBStorage() {
 
   function set(key, value, callback) {
     // IE10 has a bug and miserably fails when store.put(null, key) is called.
-    if (value == null) {
+    if (value === null || value === undefined) {
       return remove(key, callback);
     }
     withStore('readwrite', function setmBody(store) {
