@@ -13,6 +13,7 @@ function IDBStorage() {
   var DBVERSION = 1;
   var STORENAME = 'keyvaluepairs';
   var db = null;
+  var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
 
   function withStore(type, f) {
     if (db) {
@@ -37,10 +38,13 @@ function IDBStorage() {
     withStore('readonly', function getBody(store) {
       var req = store.get(key);
       req.onsuccess = function getOnSuccess() {
-        var value = req.result;
-        if (value === undefined)
-          value = null;
-        setTimeout(function() { callback(value); }, 0);
+        var value = req.result !== undefined ? req.result : null;
+
+        if (isChrome) {
+          setTimeout(function() { callback(value); }, 0);
+        } else {
+          callback(value);
+        }
       };
       req.onerror = function getOnError() {
         _error('Error in storage.get(): ' + req.error.name);
@@ -62,7 +66,11 @@ function IDBStorage() {
       var req = store.put(value, key);
       if (callback) {
         req.onsuccess = function setOnSuccess() {
-          setTimeout(callback, 0);
+          if (isChrome) {
+            setTimeout(callback, 0);
+          } else {
+            callback();
+          }
         };
       }
       req.onerror = function setOnError() {
@@ -76,7 +84,11 @@ function IDBStorage() {
       var req = store['delete'](key);
       if (callback) {
         req.onsuccess = function removeOnSuccess() {
-          setTimeout(callback, 0);
+          if (isChrome) {
+            setTimeout(callback, 0);
+          } else {
+            callback();
+          }
         };
       }
       req.onerror = function removeOnError() {
@@ -90,7 +102,11 @@ function IDBStorage() {
       var req = store.clear();
       if (callback) {
         req.onsuccess = function clearOnSuccess() {
-          setTimeout(callback, 0);
+          if (isChrome) {
+            setTimeout(callback, 0);
+          } else {
+            callback();
+          }
         };
       }
       req.onerror = function clearOnError() {
@@ -103,7 +119,11 @@ function IDBStorage() {
     withStore('readonly', function lengthBody(store) {
       var req = store.count();
       req.onsuccess = function lengthOnSuccess() {
-        setTimeout(function() { callback(req.result); }, 0);
+        if (isChrome) {
+          setTimeout(function() { callback(req.result); }, 0);
+        } else {
+          callback(req.result);
+        }
       };
       req.onerror = function lengthOnError() {
         _error('Error in storage.length(): ' + req.error.name);
