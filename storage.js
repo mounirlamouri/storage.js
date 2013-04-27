@@ -1,11 +1,11 @@
-'use strict';
-
 this.storage = (function() {
+  "use strict";
+
   var DEBUG = false;
 
-  function _error(msg) {
+  function error(msg) {
     if (DEBUG === true) {
-      console.error(msg);
+      window.console.error(msg);
     }
   }
 
@@ -21,9 +21,9 @@ this.storage = (function() {
       if (db) {
         f(db.transaction(STORENAME, type).objectStore(STORENAME));
       } else {
-        var openreq = indexedDB.open(DBNAME, DBVERSION);
+        var openreq = window.indexedDB.open(DBNAME, DBVERSION);
         openreq.onerror = function withStoreOnError() {
-          _error("storage.js: can't open database:" + openreq.error.name);
+          error("storage.js: can't open database:" + openreq.error.name);
         };
         openreq.onupgradeneeded = function withStoreOnUpgradeNeeded() {
           // First time setup: create an empty object store
@@ -49,7 +49,25 @@ this.storage = (function() {
           }
         };
         req.onerror = function getOnError() {
-          _error('Error in storage.get(): ' + req.error.name);
+          error('Error in storage.get(): ' + req.error.name);
+        };
+      });
+    }
+
+    function remove(key, callback) {
+      withStore('readwrite', function removeBody(store) {
+        var req = store['delete'](key);
+        if (callback) {
+          req.onsuccess = function removeOnSuccess() {
+            if (isChrome) {
+              setTimeout(callback, 0);
+            } else {
+              callback();
+            }
+          };
+        }
+        req.onerror = function removeOnError() {
+          error('Error in storage.remove(): ' + req.error.name);
         };
       });
     }
@@ -76,25 +94,7 @@ this.storage = (function() {
           };
         }
         req.onerror = function setOnError() {
-          _error('Error in storage.set(): ' + req.error.name);
-        };
-      });
-    }
-
-    function remove(key, callback) {
-      withStore('readwrite', function removeBody(store) {
-        var req = store['delete'](key);
-        if (callback) {
-          req.onsuccess = function removeOnSuccess() {
-            if (isChrome) {
-              setTimeout(callback, 0);
-            } else {
-              callback();
-            }
-          };
-        }
-        req.onerror = function removeOnError() {
-          _error('Error in storage.remove(): ' + req.error.name);
+          error('Error in storage.set(): ' + req.error.name);
         };
       });
     }
@@ -112,7 +112,7 @@ this.storage = (function() {
           };
         }
         req.onerror = function clearOnError() {
-          _error('Error in storage.clear(): ' + req.error.name);
+          error('Error in storage.clear(): ' + req.error.name);
         };
       });
     }
@@ -128,7 +128,7 @@ this.storage = (function() {
           }
         };
         req.onerror = function lengthOnError() {
-          _error('Error in storage.length(): ' + req.error.name);
+          error('Error in storage.length(): ' + req.error.name);
         };
       });
     }
@@ -138,7 +138,7 @@ this.storage = (function() {
       set: set,
       remove: remove,
       clear: clear,
-      length: length,
+      length: length
     };
   }
 
@@ -150,9 +150,16 @@ this.storage = (function() {
         if (value['-moz-stringifier']) {
           value = value['-moz-stringifier'];
         }
-      } catch(e) {
+      } catch (e) {
       } finally {
         setTimeout(function() { callback(value); }, 0);
+      }
+    }
+
+    function remove(key, callback) {
+      localStorage.removeItem(key);
+      if (callback) {
+        setTimeout(callback, 0);
       }
     }
 
@@ -171,13 +178,6 @@ this.storage = (function() {
       }
     }
 
-    function remove(key, callback) {
-      localStorage.removeItem(key);
-      if (callback) {
-        setTimeout(callback, 0);
-      }
-    }
-
     function clear(callback) {
       localStorage.clear();
       if (callback) {
@@ -186,8 +186,8 @@ this.storage = (function() {
     }
 
     function length(callback) {
-      var length = localStorage.length;
-      setTimeout(function() { callback(length); }, 0);
+      var result = localStorage.length;
+      setTimeout(function() { callback(result); }, 0);
     }
 
     return {
@@ -195,13 +195,13 @@ this.storage = (function() {
       set: set,
       remove: remove,
       clear: clear,
-      length: length,
+      length: length
     };
   }
 
   if ('indexedDB' in window) {
-    return IDBStorage();
+    return new IDBStorage();
   }
   // We don't expect any other kind of fallback for the moment.
-  return LocalStorage();
+  return new LocalStorage();
 }());
