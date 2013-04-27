@@ -58,7 +58,7 @@ Tests are available in *test.html*.
 They currently pass in:
  * IE8+
  * Firefox 3.5+
- * Chrome 7+ (4-6 not tested)
+ * Chrome 5+
  * Opera 10.0+
  * Safari 4.0+
  * Safari iOS 3.2+
