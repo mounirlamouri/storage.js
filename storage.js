@@ -117,7 +117,7 @@ function IDBStorage() {
 
 function LocalStorage() {
   function get(key, callback) {
-    var value = localStorage.get(key);
+    var value = localStorage.getItem(key);
     try {
       value = JSON.parse(value);
       if (value['-moz-stringifier']) {
@@ -138,12 +138,12 @@ function LocalStorage() {
       value = { '-moz-stringifier': value };
       value = JSON.stringify(value);
     }
-    localStorage.set(key, value);
+    localStorage.setItem(key, value);
     setTimeout(callback, 0);
   }
 
   function remove(key, callback) {
-    localStorage.remove(key);
+    localStorage.removeItem(key);
     setTimeout(callback, 0);
   }
 
