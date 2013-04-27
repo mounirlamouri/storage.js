@@ -164,17 +164,23 @@ function LocalStorage() {
     }
 
     localStorage.setItem(key, value);
-    setTimeout(callback, 0);
+    if (callback) {
+      setTimeout(callback, 0);
+    }
   }
 
   function remove(key, callback) {
     localStorage.removeItem(key);
-    setTimeout(callback, 0);
+    if (callback) {
+      setTimeout(callback, 0);
+    }
   }
 
   function clear(callback) {
     localStorage.clear();
-    setTimeout(callback, 0);
+    if (callback) {
+      setTimeout(callback, 0);
+    }
   }
 
   function length(callback) {
