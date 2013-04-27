@@ -62,7 +62,7 @@ function IDBStorage() {
       throw "InvalidArgument";
     }
 
-    withStore('readwrite', function setmBody(store) {
+    withStore('readwrite', function setBody(store) {
       var req = store.put(value, key);
       if (callback) {
         req.onsuccess = function setOnSuccess() {
