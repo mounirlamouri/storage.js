@@ -3,6 +3,7 @@
   <head>
     <title>Tests for storage.js</title>
     <meta charset='utf-8'>
+    <script src='third_party/kamino.min.js'></script>
     <script src='storage.js'></script>
     <style>
       .success {
@@ -56,6 +57,14 @@
 
       function is(value, test, msg) {
         if (value === test) {
+          success(msg);
+        } else {
+          failure(msg, value, test);
+        }
+      }
+
+      function isnot(value, test, msg) {
+        if (value !== test) {
           success(msg);
         } else {
           failure(msg, value, test);
@@ -125,11 +134,14 @@
           });
         },
 
-        // Check complex get/set/remove.
-        // This is currently disabled because not supported.
-        /*
+        // Check complex get/set/remove (structured clone).
         function() {
           var object = {
+            a: new Blob(['foobar'], { type: 'text/html'}),
+            b: new Date(),
+            c: Infinity,
+            d: NaN,
+            e: undefined,
             x: 1,
             y: 'foo',
             z: true
@@ -138,9 +150,14 @@
           storage.set('foo', object, function() {
             storage.get('foo', function(result) {
               is(typeof result, 'object', 'result should be an object');
-              is(result.x, 1, 'result.x should be 1');
-              is(result.y, 'foo', 'result.y should be \'foo\'');
-              is(result.z, true, 'result.z should be true');
+              is(result.a.size, object.a.size, 'result.a is okay');
+              is(result.b.toString(), object.b.toString(), 'result.b is okay');
+              is(result.c, object.c, 'result.c is okay');
+              // NaN is not equal to itself.
+              isnot(result.d, result.d, 'result.d is okay');
+              is(result.x, object.x, 'result.x should be 1');
+              is(result.y, object.y, 'result.y should be \'foo\'');
+              is(result.z, object.z, 'result.z should be true');
 
               storage.remove('foo', function() {
                 storage.get('foo', function(value) {
@@ -150,7 +167,21 @@
               });
             });
           });
-        },*/
+        },
+
+        // storage.set() does not accept some values.
+        function() {
+          try {
+            storage.set('foo', document.createElement('div'), function() {
+              is(true, false, 'should have failed');
+              next();
+            });
+          } catch(e) {
+            is(true, true, "can't set an HTMLElement");
+          }
+
+          next();
+        },
 
         // Check clear/length/key.
         function() {
@@ -184,40 +215,6 @@
             });
           });
         },
-
-        // storage.set() doesn't take objects.
-        function() {
-          try {
-            storage.set('foo', document.createElement('div'), function() {
-              is(true, false, 'should have failed');
-              next();
-            });
-          } catch(e) {
-            is(true, true, "can't set an HTMLElement");
-          }
-
-          try {
-            storage.set('foo', new Blob(), function() {
-              is(true, false, 'should have failed');
-              next();
-            });
-          } catch(e) {
-            is(true, true, "can't set a Blob");
-          }
-
-          try {
-            storage.set('foo', { x: 'bar' },
-              function() {
-                is(true, false, 'should have failed');
-                next();
-              }
-            );
-          } catch (e) {
-            is(true, true, "can't set an object");
-          }
-
-          next();
-        }
       ];
 
       // Start the test suite.

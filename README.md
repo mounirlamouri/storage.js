@@ -51,6 +51,19 @@ Clearing the database:
   });
 ```
 
+## Dependencies
+
+Kamino.js is a mandatory dependency:
+https://github.com/tildeio/kamino.js
+
+Kamino.js implements the structured cloned algorithm which is used by IndexedDB.
+Using Kamino.js implementation allows to store the same data in localStorage and
+IndexedDB.
+
+Ideally, this dependency should only be needed if you want to use the
+localStorage backend but it happens that Chrome has a few bugs with IndexedDB or
+its structured clone algorithm. Using Kamino.js fixes this.
+
 ## Tests
 
 Tests are available in *test.html*.

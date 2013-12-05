@@ -43,6 +43,7 @@ this.storage = (function() {
           var value = req.result !== undefined ? req.result : null;
 
           if (isChrome) {
+            value = Kamino.parse(value);
             setTimeout(function() { callback(value); }, 0);
           } else {
             callback(value);
@@ -78,8 +79,8 @@ this.storage = (function() {
         return remove(key, callback);
       }
 
-      if (typeof value === 'object') {
-        throw "InvalidArgument";
+      if (isChrome) {
+        value = Kamino.stringify(value);
       }
 
       withStore('readwrite', function setBody(store) {
@@ -144,16 +145,8 @@ this.storage = (function() {
 
   function LocalStorage() {
     function get(key, callback) {
-      var value = localStorage.getItem(key);
-      try {
-        value = JSON.parse(value);
-        if (value['-moz-stringifier']) {
-          value = value['-moz-stringifier'];
-        }
-      } catch (e) {
-      } finally {
-        setTimeout(function() { callback(value); }, 0);
-      }
+      var value = Kamino.parse(localStorage.getItem(key));
+      setTimeout(function() { callback(value); }, 0);
     }
 
     function remove(key, callback) {
@@ -168,11 +161,7 @@ this.storage = (function() {
         return remove(key, callback);
       }
 
-      if (typeof value === 'object') {
-        throw "InvalidArgument";
-      }
-
-      localStorage.setItem(key, value);
+      localStorage.setItem(key, Kamino.stringify(value));
       if (callback) {
         setTimeout(callback, 0);
       }
