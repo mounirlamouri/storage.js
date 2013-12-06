@@ -189,8 +189,10 @@ this.storage = (function() {
   }
 
   if ('indexedDB' in window) {
+    if (DEBUG) window.console.log('Using IDBStorage');
     return new IDBStorage();
   }
   // We don't expect any other kind of fallback for the moment.
+  if (DEBUG) window.console.log('Using LocalStorage');
   return new LocalStorage();
 }());
