@@ -42,6 +42,7 @@ this.storage = (function() {
         req.onsuccess = function getOnSuccess() {
           var value = req.result !== undefined ? req.result : null;
 
+          // http://crbug.com/108012
           if (isChrome) {
             value = Kamino.parse(value);
             setTimeout(function() { callback(value); }, 0);
@@ -79,6 +80,7 @@ this.storage = (function() {
         return remove(key, callback);
       }
 
+      // http://crbug.com/108012
       if (isChrome) {
         value = Kamino.stringify(value);
       }
