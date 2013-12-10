@@ -100,6 +100,7 @@ Not tested but should be working on:
  * Chrome Android
  * Blackberry Mobile
 
-## Authors
+## Acknowledgment
 
-David Flanagan & Mounir Lamouri
+Thanks to Bent Turner, David Flanagan, Jonas Sicking and Yehuda Katz for their
+help.
