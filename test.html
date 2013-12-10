@@ -3,8 +3,8 @@
   <head>
     <title>Tests for storage.js</title>
     <meta charset='utf-8'>
-    <script src='third_party/IndexedDBShim.min.js'></script>
     <script src='third_party/kamino.min.js'></script>
+    <script src='third_party/IndexedDBShim.min.js'></script>
     <script src='storage.js'></script>
     <style>
       .success {
@@ -137,12 +137,15 @@
 
         // Check complex get/set/remove (structured clone).
         function() {
+          var input = document.createElement('input');
+          input.type = 'file';
           var object = {
             a: new Blob(['foobar'], { type: 'text/html'}),
             b: new Date(),
             c: Infinity,
             d: NaN,
             e: undefined,
+            f: input.files,
             x: 1,
             y: 'foo',
             z: true
@@ -150,12 +153,28 @@
 
           storage.set('foo', object, function() {
             storage.get('foo', function(result) {
+              var isChrome = /Chrome/.test(navigator.userAgent) &&
+                             /Google Inc/.test(navigator.vendor);
+              // Sadly, Kamino is not as good as native structured clone.
+              var usingKamino = ('indexedDB' in window) || isChrome;
+
               is(typeof result, 'object', 'result should be an object');
+              if (!usingKamino)
+                is(result.a.toString(), object.a.toString(), 'result.a is okay');
               is(result.a.size, object.a.size, 'result.a is okay');
+              is(result.a.type, object.a.type, 'result.a is okay');
+              if (!usingKamino)
+                is(result.a.__proto__, object.a.__proto__, 'result.a is okay');
               is(result.b.toString(), object.b.toString(), 'result.b is okay');
               is(result.c, object.c, 'result.c is okay');
               // NaN is not equal to itself.
               isnot(result.d, result.d, 'result.d is okay');
+              is(result.e, object.e, 'result.e is okay');
+              if (!usingKamino) {
+                is(result.f.toString(), object.f.toString(), 'result.f is okay');
+                is(result.f.__proto__, object.f.__proto__, 'result.f is okay');
+              }
+              is(result.f.length, object.f.length, 'result.f is okay');
               is(result.x, object.x, 'result.x should be 1');
               is(result.y, object.y, 'result.y should be \'foo\'');
               is(result.z, object.z, 'result.z should be true');
