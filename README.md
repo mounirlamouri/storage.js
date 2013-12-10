@@ -8,8 +8,8 @@ transparent for the developers.
 ## API
 
 The API aims to be very simple and close to localStorage that is known by most
-web developers. That means that whatever the backend is (IndexedDB or
-localStorage), the data store is going to be represented as a key/value store.
+web developers. That means that whatever the backend is the data store is going
+to be represented as a key/value store.
 
 The API is accessible from `window.storage` on which the following methods can
 be accessed:
@@ -27,6 +27,23 @@ length(function callback(length) {});
 ```
 
 The behaviour of the methods should be self-explanatory.
+
+## Backends
+
+There are two backends supported natively: IndexedDB and localStorage. IndexedDB
+is supported by all latest major desktop browsers except Safari. Unfortunately,
+on mobile, the support of IndexedDB is barely existent.
+
+LocalStorage is widely supported (~90% at time of writing) but is a synchronous
+API using it will slow done down the entire browser UI. It is used as a fallback
+backend.
+
+WebSQL is not yet supported by default but WebSQL to IndexedDB shims can be used
+and should provide most if not full support. The recommended shims is
+https://github.com/axemclion/IndexedDBShim which provides full support except
+for null and undefined in structured clones. An alternative is
+https://github.com/facebook/IndexedDB-polyfill which has the same bugs and some
+more.
 
 ## Examples
 
