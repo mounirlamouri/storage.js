@@ -20,20 +20,27 @@ this.storage = (function() {
     function withStore(type, f) {
       if (db) {
         f(db.transaction(STORENAME, type).objectStore(STORENAME));
-      } else {
-        var openreq = window.indexedDB.open(DBNAME, DBVERSION);
-        openreq.onerror = function withStoreOnError() {
-          error("storage.js: can't open database:" + openreq.error.name);
-        };
-        openreq.onupgradeneeded = function withStoreOnUpgradeNeeded() {
-          // First time setup: create an empty object store
-          openreq.result.createObjectStore(STORENAME);
-        };
-        openreq.onsuccess = function withStoreOnSuccess() {
-          db = openreq.result;
-          f(db.transaction(STORENAME, type).objectStore(STORENAME));
-        };
+        return;
       }
+
+      var openreq = window.indexedDB.open(DBNAME, DBVERSION);
+      openreq.onerror = function withStoreOnError() {
+        error("storage.js: can't open database: '" + openreq.error.name + "'");
+      };
+      openreq.onupgradeneeded = function withStoreOnUpgradeNeeded() {
+        // First time setup: create an empty object store
+        openreq.result.createObjectStore(STORENAME);
+      };
+      openreq.onsuccess = function withStoreOnSuccess() {
+        db = openreq.result;
+        f(db.transaction(STORENAME, type).objectStore(STORENAME));
+      };
+      openreq.onversionchanged = function withStoreOnVersionChanged() {
+        error("storage.js: unexpected 'versionchanged' event!");
+      };
+      openreq.onblocked = function withStoreOnBlocked() {
+        error("storage.js: unexpected 'blocked' event!");
+      };
     }
 
     function get(key, callback) {
